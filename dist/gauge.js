@@ -375,6 +375,7 @@ const defineGauge = () => {
       this.ctx.beginPath();
       this.ctx.fillStyle = this.options.color;
       this.ctx.arc(0, 0, this.strokeWidth, 0, Math.PI * 2, false);
+      this.ctx.arc(0, 0, this.strokeWidth+3, 0, Math.PI * 2, false);
       this.ctx.fill();
       this.ctx.beginPath();
       this.ctx.moveTo(startX, startY);
