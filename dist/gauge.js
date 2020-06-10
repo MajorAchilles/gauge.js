@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 const defineGauge = () => {
   const extend = (child, parent) => {
     for (var key in parent) {
@@ -65,6 +67,10 @@ const defineGauge = () => {
       };
     }
   })();
+
+  const getFactorCurve = x => {
+    return 1.2 - (4 * x) +( 0.05*Math.pow(x, 2))
+  }
 
   const secondsToString = (sec) => {
     var hr, min;
@@ -631,10 +637,12 @@ const defineGauge = () => {
       rest = font.slice(match.length);
       fontsize = parseFloat(match) * this.displayScale;
       this.ctx.font = fontsize + rest;
+      this.ctx.textBaseline = "middle";
+      this.ctx.textAlign = "center"
       this.ctx.fillStyle = staticLabels.color || "#000000";
-      this.ctx.textBaseline = "bottom";
-      this.ctx.textAlign = "center";
       ref = staticLabels.labels;
+      let minRot = 0;
+      let maxRot = 0;
       for (j = 0, len = ref.length; j < len; j++) {
         value = ref[j];
         if (value.label !== void 0) {
@@ -652,12 +660,23 @@ const defineGauge = () => {
         } else {
           if ((!this.options.limitMin || value >= this.minValue) && (!this.options.limitMax || value <= this.maxValue)) {
             rotationAngle = this.getAngle(value) - 3 * Math.PI / 2;
-            this.ctx.rotate(rotationAngle);
-            this.ctx.fillText(formatNumber(value, staticLabels.fractionDigits), 0, -radius - this.lineWidth / 2);
-            this.ctx.rotate(-rotationAngle);
+            const paddingFactor = 1.4;//getFactorCurve(rotationAngle);
+
+            const xT = Math.cos(rotationAngle - Math.PI/2) * (radius * paddingFactor);
+            const yT = Math.sin(rotationAngle - Math.PI/2) * (radius * paddingFactor);
+
+            this.ctx.beginPath();
+            this.ctx.arc(xT, yT, 5, 0, 2 * Math.PI);
+            this.ctx.fill();
+            this.ctx.fillText(formatNumber(value, staticLabels.fractionDigits), xT, yT);
           }
         }
       }
+
+      // console.log({
+      //   minRot,
+      //   maxRot
+      // });
       return this.ctx.restore();
     };
 
